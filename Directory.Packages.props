@@ -1,0 +1,29 @@
+<!-- see https://devblogs.microsoft.com/nuget/announcing-nuget-6-5-the-sweetest-way-to-manage-your-packages/ -->
+<!-- see https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
+<Project>
+  <!-- Enable Directory.Packages.props for all projects except .dcproj (Docker project) -->
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' != '.dcproj'">
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Global Analyzers -->
+    <GlobalPackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4" />
+    <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.1.118" />
+    <GlobalPackageReference Include="Roslynator.Analyzers" Version="4.5.0" />
+    <GlobalPackageReference Include="Roslynator.Formatting.Analyzers" Version="4.5.0" />
+    <GlobalPackageReference Include="SonarAnalyzer.CSharp" Version="9.11.0.78383" />
+    <GlobalPackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="4.7.0" />
+    <GlobalPackageReference Include="Meziantou.Analyzer" Version="2.0.82" />
+    <GlobalPackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.7.30" />
+    <GlobalPackageReference Include="AsyncFixer" Version="1.6.0" />
+  </ItemGroup>
+  <!-- Packages -->
+  <ItemGroup>
+    <PackageVersion Include="CommandLineParser" Version="2.9.1" />
+    <PackageVersion Include="DotEnv.Core" Version="3.0.0" />
+    <PackageVersion Include="ini-parser-netstandard" Version="2.5.2" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+</Project>
