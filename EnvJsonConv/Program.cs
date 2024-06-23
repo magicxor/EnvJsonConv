@@ -1,6 +1,5 @@
 ﻿using CommandLine;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics.CodeAnalysis;
 
 namespace EnvJsonConv;
 
@@ -10,6 +9,8 @@ internal static class Program
     private const int Success = 0;
     private const int ErrorBadArguments = 160;
 
+    private static readonly CancellationTokenSource CancellationTokenSource = new();
+
     private static ServiceProvider CreateServiceProvider()
     {
         var serviceCollection = new ServiceCollection();
@@ -18,13 +19,11 @@ internal static class Program
         return serviceProvider;
     }
 
-    [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "CancellationTokenSource is disposed in the end of the method")]
     private static async Task<int> OnParsedAsync(CommandLineOptions commandLineOptions)
     {
-        var cancelTokenSource = new CancellationTokenSource();
         Console.CancelKeyPress += (_, a) =>
         {
-            cancelTokenSource.Cancel();
+            CancellationTokenSource.Cancel();
             a.Cancel = true;
         };
 
@@ -42,14 +41,23 @@ internal static class Program
 
     private static async Task<int> Main(string[] args)
     {
-        using var parser = new Parser(settings =>
+        try
         {
-            settings.CaseSensitive = true;
-            settings.IgnoreUnknownArguments = false;
-            settings.HelpWriter = Console.Out;
-        });
-        var exitCode = await parser.ParseArguments<CommandLineOptions>(args)
-            .MapResult(OnParsedAsync, OnNotParsedAsync);
-        return exitCode;
+            using var parser = new Parser(settings =>
+            {
+                settings.CaseSensitive = true;
+                settings.IgnoreUnknownArguments = false;
+                settings.HelpWriter = Console.Out;
+            });
+
+            var exitCode = await parser.ParseArguments<CommandLineOptions>(args)
+                .MapResult(OnParsedAsync, OnNotParsedAsync);
+
+            return exitCode;
+        }
+        finally
+        {
+            CancellationTokenSource.Dispose();
+        }
     }
 }

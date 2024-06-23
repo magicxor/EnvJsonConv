@@ -167,6 +167,9 @@ dotnet_diagnostic.MA0002.severity = none
 # MA0004: Use Task.ConfigureAwait(false) as the current SynchronizationContext is not needed
 dotnet_diagnostic.MA0004.severity = none
 
+# AsyncFixer02: CancelAsync should be used instead of CancellationTokenSource.Cancel
+dotnet_diagnostic.AsyncFixer02.severity = none
+
 # formatting rules
 indent_size = 4
 roslynator_binary_operator_new_line = before
