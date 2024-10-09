@@ -9,6 +9,7 @@ on:
 name: release
 
 env:
+  PROJECT_DIR: ./EnvJsonConv
   PROJECT_PATH: ./EnvJsonConv/EnvJsonConv.csproj
   FRAMEWORK: net8.0
   SELF_CONTAINED: true
@@ -58,7 +59,7 @@ jobs:
 
       - name: Build and package
         id: build_package
-        working-directory: ${{ env.PROJECT_PATH }}/..
+        working-directory: ${{ env.PROJECT_DIR }}
         shell: bash
         run: |
           if [ "${{ env.SELF_CONTAINED }}" = "true" ]; then
@@ -81,7 +82,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.build_package.outputs.ZIP_NAME }}
-          path: ${{ env.PROJECT_PATH }}/../${{ steps.build_package.outputs.ZIP_NAME }}
+          path: ${{ env.PROJECT_DIR }}/${{ steps.build_package.outputs.ZIP_NAME }}
 
   publish:
     name: Publish Release
