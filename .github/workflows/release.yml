@@ -1,0 +1,77 @@
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-alpha.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-beta.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+'
+
+name: release
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Get branch and tag
+        id: branch_name
+        run: |
+          echo "SOURCE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Get ref info
+        id: ref_info
+        env:
+          GIT_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+        run: |
+          if [[ -z ${GIT_TAG} ]] || [[ ${GIT_TAG} == refs/heads/* ]]; then exit 1; else appversion=${GIT_TAG}; fi
+          echo "VERSION=${appversion}" >> $GITHUB_OUTPUT
+          if [[ ${GIT_TAG} =~ (alpha|beta|rc) ]]; then echo "IS_PRERELEASE=true" >> $GITHUB_OUTPUT; else echo "IS_PRERELEASE=false" >> $GITHUB_OUTPUT; fi
+          if [[ ${GIT_TAG} =~ (alpha|beta|rc) ]]; then echo "MAKE_LATEST=false" >> $GITHUB_OUTPUT; else echo "MAKE_LATEST=true" >> $GITHUB_OUTPUT; fi
+
+      - name: Replace project version
+        env:
+          GIT_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+        # replace <Version>0.0.1</Version> with <Version>$GIT_TAG</Version>
+        # in "./EnvJsonConv/EnvJsonConv.csproj"
+        run: |
+          if [[ -z ${GIT_TAG} ]] || [[ ${GIT_TAG} == refs/heads/* ]]; then exit 1; else appversion=${GIT_TAG}; fi
+          sed -i "s/<Version>.*<\/Version>/<Version>${appversion}<\/Version>/" ./EnvJsonConv/EnvJsonConv.csproj
+
+      - name: Build and package
+        working-directory: ./EnvJsonConv
+        run: |
+          dotnet publish -c release -r win-x64 --framework net8.0 --self-contained
+          dotnet publish -c release -r win-arm64 --framework net8.0 --self-contained
+          dotnet publish -c release -r linux-x64 --framework net8.0 --self-contained
+          dotnet publish -c release -r linux-arm64 --framework net8.0 --self-contained
+          dotnet publish -c release -r osx-arm64 --framework net8.0 --self-contained
+          7z a EnvJsonConv_win-x64_net8.0_self-contained.zip ./bin/release/net8.0/win-x64/publish/*
+          7z a EnvJsonConv_win-arm64_net8.0_self-contained.zip ./bin/release/net8.0/win-arm64/publish/*
+          7z a EnvJsonConv_linux-x64_net8.0_self-contained.zip ./bin/release/net8.0/linux-x64/publish/*
+          7z a EnvJsonConv_linux-arm64_net8.0_self-contained.zip ./bin/release/net8.0/linux-arm64/publish/*
+          7z a EnvJsonConv_osx-arm64_net8.0_self-contained.zip ./bin/release/net8.0/osx-arm64/publish/*
+
+      - name: Publish
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          prerelease: ${{ steps.ref_info.outputs.IS_PRERELEASE }}
+          make_latest: ${{ steps.ref_info.outputs.MAKE_LATEST }}
+          generate_release_notes: true
+          files: |
+            ./EnvJsonConv/EnvJsonConv_win-x64_net8.0_self-contained.zip
+            ./EnvJsonConv/EnvJsonConv_win-arm64_net8.0_self-contained.zip
+            ./EnvJsonConv/EnvJsonConv_linux-x64_net8.0_self-contained.zip
+            ./EnvJsonConv/EnvJsonConv_linux-arm64_net8.0_self-contained.zip
+            ./EnvJsonConv/EnvJsonConv_osx-arm64_net8.0_self-contained.zip

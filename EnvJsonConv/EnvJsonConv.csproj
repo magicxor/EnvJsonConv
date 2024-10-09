@@ -8,6 +8,17 @@
     <LangVersion>default</LangVersion>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <Version>0.0.1</Version>
+    <Copyright>Ilia Burakov</Copyright>
+    <Authors>Ilia Burakov</Authors>
+    <PackageTags>config;cli;converter;json;development;developer-tools;env;ini;command-line-tool</PackageTags>
+    <RepositoryUrl>https://github.com/magicxor/EnvJsonConv.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageLicenseExpression>Unlicense</PackageLicenseExpression>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="CommandLineParser" />
     <PackageReference Include="DotEnv.Core" />
