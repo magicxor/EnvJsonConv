@@ -4,7 +4,7 @@
   <PropertyGroup>
     <!-- Code analysis -->
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <AnalysisLevel>latest-all</AnalysisLevel>
+    <AnalysisLevel>9-Recommended</AnalysisLevel>
 
     <!-- Warnings and errors -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

@@ -170,6 +170,9 @@ dotnet_diagnostic.MA0004.severity = none
 # AsyncFixer02: CancelAsync should be used instead of CancellationTokenSource.Cancel
 dotnet_diagnostic.AsyncFixer02.severity = none
 
+# S2325: Make X a static method
+dotnet_diagnostic.S2325.severity = suggestion
+
 # formatting rules
 indent_size = 4
 roslynator_binary_operator_new_line = before
