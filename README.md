@@ -1,4 +1,7 @@
 # EnvJsonConv
+
+[![release](https://github.com/magicxor/EnvJsonConv/actions/workflows/release.yml/badge.svg)](https://github.com/magicxor/EnvJsonConv/actions/workflows/release.yml)
+
 Converts ASP.NET Core configs: .env to .json and vice versa
 
 ## Usage
